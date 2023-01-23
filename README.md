@@ -8,5 +8,5 @@ konnichiwa is a webAPI for a conceptual socialmedia.
 * Updating user profile
 * Uploading profile picture
 * Like and comment functionality for posts.
-* Search for users,posts and comments.
+* Search for users, posts and comments.
 * Sorting results by date, likes and comments.
