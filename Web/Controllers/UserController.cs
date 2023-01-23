@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web.Controllers;
 
@@ -29,10 +30,16 @@ public class UserController : Controller
         _validator = validator;
     }
     [HttpGet]
-    public IActionResult GetUser(string username)
+    public async Task<IActionResult> GetUser(string username)
     {
-        User user = _context.Users.FirstOrDefault(x => x.UserName == username);
-        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var userDto = _mapper.Map<GetUserDto>(user);
         return Ok(userDto);
     }
     [HttpPost]
@@ -52,45 +59,81 @@ public class UserController : Controller
     }
     [HttpPut("/user/updateProfile")]
     [Authorize]
-    public IActionResult UpdateUserProfile(UpdateUserDto updateUser)
+    [Authorize]
+    public async Task<IActionResult> UpdateUserProfile(UpdateUserDto updateUser)
     {
         var currentUser = User.Identity.Name;
-        var user = _context.Users.FirstOrDefault(x => x.UserName == currentUser);
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == currentUser);
+        if (user == null)
+        {
+            return NotFound("User not found");
+        }
+
         user = _mapper.Map(updateUser, user);
         _context.Users.Update(user);
-        _context.SaveChanges();
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            return BadRequest("Error updating user profile: " + ex.Message);
+        }
+
         return Ok();
     }
     [HttpPut("/user/updateUserPassword/")]
     [Authorize]
-    public IActionResult UpdateUserPassword(UpdateUserPasswordDto updateUserPassword)
+    public async Task<IActionResult> UpdateUserPassword(UpdateUserPasswordDto updateUserPassword)
     {
-        var currentUser = User.Identity.Name;
-        var user = _context.Users.FirstOrDefault(x => x.UserName == currentUser);
-        user = _mapper.Map(updateUserPassword, user);
-        _context.Users.Update(user);
-        _context.SaveChanges();
-        return Ok();
+        try
+        {
+            var currentUser = User.Identity.Name;
+            var user = _context.Users.FirstOrDefault(x => x.UserName == currentUser);
+            user = _mapper.Map(updateUserPassword, user);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
     [HttpPut("/user/updateUserProfilePic/")]
     [Authorize]
-    public IActionResult UpdateUserProfilePic(UpdateUserProfilePicDto updateUserProfilePic)
+    public async Task<IActionResult> UpdateUserProfilePic(UpdateUserProfilePicDto updateUserProfilePic)
     {
-        var currentUser = User.Identity.Name;
-        var user = _context.Users.FirstOrDefault(x => x.UserName == currentUser);
-        user = _mapper.Map(updateUserProfilePic, user);
-        _context.Users.Update(user);
-        _context.SaveChanges();
-        return Ok();
+        try
+        {
+            var currentUser = User.Identity.Name;
+            var user = _context.Users.FirstOrDefault(x => x.UserName == currentUser);
+            user = _mapper.Map(updateUserProfilePic, user);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
     [HttpDelete("/User/")]
     [Authorize]
-    public IActionResult DeletePost(int userId)
+    public async Task<IActionResult> DeletePost(int userId)
     {
-        var currentUser = User.Identity.Name;
-        var user = _context.Users.FirstOrDefault(x => x.UserName == currentUser);
-        _context.Users.Remove(user);
-        _context.SaveChanges();
-        return Ok();
+        try
+        {
+            var currentUser = User.Identity.Name;
+            var user = _context.Users.FirstOrDefault(x => x.UserName == currentUser);
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 }

@@ -25,13 +25,13 @@ namespace Web.Controllers
         public IActionResult GetAllPosts(int page = 1, int pageSize = 10)
         {
             var posts = _context.post
-                .Include(p => p.User) // include the user navigation property
-                .OrderByDescending(p => p.Created) // order the posts by descending date
-                .Skip((page - 1) * pageSize) //skip the pages before the current one
-                .Take(pageSize) // take the current page size
-                .ToList(); // convert the result to a list
+                .Include(p => p.User)
+                .OrderByDescending(p => p.Created)
+                .Skip((page - 1) * pageSize) 
+                .Take(pageSize)
+                .ToList();
 
-            var postDtos = _mapper.Map<List<PostDto>>(posts); // map the posts to dtos
+            var postDtos = _mapper.Map<List<PostDto>>(posts);
 
             return Ok(postDtos);
         }

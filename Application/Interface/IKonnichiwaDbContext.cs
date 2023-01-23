@@ -14,4 +14,5 @@ public interface IKonnichiwaDbContext
     public DbSet<Comments> Comment { get; set; }
     public DbSet<Likes> Like { get; set; }
     int SaveChanges();
+    Task<int> SaveChangesAsync();
 }
