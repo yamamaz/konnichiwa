@@ -31,4 +31,9 @@ public class KonnichiwaDbContext : DbContext, IKonnichiwaDbContext
     {
         return base.SaveChanges();
     }
+
+    public Task<int> SaveChangesAsync()
+    {
+        throw new NotImplementedException();
+    }
 }
