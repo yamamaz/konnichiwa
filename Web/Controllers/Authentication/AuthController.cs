@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
     }
     private string CreateToken(IEnumerable<Claim> claims, DateTime expiresAt)
     {
-        var secretKey = Encoding.ASCII.GetBytes(_configuration.GetSection("JWT").GetValue<string>("SecretKey"));
+        var secretKey = Encoding.ASCII.GetBytes("super secret key");
         var jwt = new JwtSecurityToken(
             claims: claims,
             notBefore: DateTime.UtcNow,

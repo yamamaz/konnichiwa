@@ -23,7 +23,7 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JWT").GetValue<string>("SecretKey"))),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("super secret key")),
         ValidateLifetime= true,
         ValidateAudience = false,
         ValidateIssuer = false,
